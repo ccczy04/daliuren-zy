@@ -64,22 +64,7 @@ class DaLiuRenPan:
         self.xiu_map = self._build_28xiu()
         self.shen_sha = self._build_shen_sha()
         self.duan_yu = self._get_duan_yu()
-    def _ke(self, a, b):
-    """判断 a 是否克 b（五行相克）"""
-    ke_map = {'水':'火', '火':'金', '金':'木', '木':'土', '土':'水'}
-    # get_elem 是您在文件顶部定义的全局函数，直接使用
-    return ke_map.get(get_elem(a)) == get_elem(b)
-
-    class DaLiuRenPan:
-    def __init__(self, day_stem, day_branch, hour_branch, yue_jiang, is_day=True, birth_year=None, gender=None):
-        # ... 原有代码 ...
-
-    def _ke(self, a, b):
-        ke_map = {'水':'火', '火':'金', '金':'木', '木':'土', '土':'水'}
-        return ke_map.get(get_elem(a)) == get_elem(b)
-
-    # ... 其他方法 ...
-  
+ 
     @classmethod
     def from_gregorian(cls, year, month, day, hour, is_day=True, birth_year=None, gender=None):
         dt = datetime.date(year, month, day)
