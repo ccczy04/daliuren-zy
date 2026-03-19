@@ -2,6 +2,7 @@ import datetime
 import streamlit as st
 import matplotlib.pyplot as plt
 from io import BytesIO
+from matplotlib.patches import Rectangle
 
 # ====================== 所有数据表（完整无缺） ======================
 branches = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥']
@@ -136,17 +137,21 @@ class DaLiuRenPan:
             pos = (pos + direction) % 12
         return tj_pos
 
-    def _build_three_trans(self):
+       def _build_three_trans(self):
         lessons = self.four_lessons
         xia_zei = []
         for upper, lower in lessons:
             if lower not in branches: continue
-            if self._clash(lower, upper):
+            if self._ke(lower, upper):   # 下贼上
                 xia_zei.append(upper)
         if xia_zei:
             init = xia_zei[0]
             method = "贼克（重审）"
-        elif any(self._clash(u, l) for u, l in lessons if l in branches):
+        elif any(self._ke(u, l) for u, l in lessons if l in branches):
+            for u, l in lessons:
+                if l in branches and self._ke(u, l):
+                    init = u
+                    break
             method = "贼克（元首）"
         # 完整别责（新增细则）
         elif len([l for _,l in lessons if l in branches]) == 3:
