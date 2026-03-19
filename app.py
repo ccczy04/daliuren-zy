@@ -201,7 +201,7 @@ class DaLiuRenPan:
                  f"神煞：{self.shen_sha}", "参考断语：" + " | ".join(self.duan_yu)]
         return "\n".join(lines)
 
-       def generate_pan_image(self):
+    def generate_pan_image(self):
         fig, ax = plt.subplots(figsize=(14, 16), facecolor='white')
         ax.axis('off')
 
