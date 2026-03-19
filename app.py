@@ -1,5 +1,3 @@
-# daliuren-zy
-use for creating daliuren 
 import datetime
 import streamlit as st
 import matplotlib.pyplot as plt
