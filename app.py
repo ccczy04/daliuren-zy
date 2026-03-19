@@ -24,7 +24,11 @@ def get_elem(b):
     if b in '巳午': return '火'
     if b in '申酉': return '金'
     return '土'
-
+def ke(a, b):
+    """判断 a 是否克 b（五行相克）"""
+    ke_map = {'水':'火', '火':'金', '金':'木', '木':'土', '土':'水'}
+    return ke_map.get(get_elem(a)) == get_elem(b)
+  
 xiu_list = ['角','亢','氐','房','心','尾','箕','斗','牛','女','虚','危','室','壁','奎','娄','胃','昴','毕','觜','参','井','鬼','柳','星','张','翼','轸']
 ma_dict = {'寅':'申','午':'申','戌':'申','巳':'亥','酉':'亥','丑':'亥','申':'寅','子':'寅','辰':'寅','亥':'巳','卯':'巳','未':'巳'}
 he_dict = {'甲':'己','乙':'庚','丙':'辛','丁':'壬','戊':'癸','己':'甲','庚':'乙','辛':'丙','壬':'丁','癸':'戊'}
@@ -136,19 +140,20 @@ class DaLiuRenPan:
             tj_pos[tj] = branches[pos]
             pos = (pos + direction) % 12
         return tj_pos
+      
     def _build_three_trans(self):
         lessons = self.four_lessons
         xia_zei = []
         for upper, lower in lessons:
             if lower not in branches: continue
-            if self._ke(lower, upper):   # 下贼上
+            if ke(lower, upper):   # 改为 ke(lower, upper) 而不是 self._ke
                 xia_zei.append(upper)
         if xia_zei:
             init = xia_zei[0]
             method = "贼克（重审）"
-        elif any(self._ke(u, l) for u, l in lessons if l in branches):
+        elif any(ke(u, l) for u, l in lessons if l in branches):
             for u, l in lessons:
-                if l in branches and self._ke(u, l):
+                if l in branches and ke(u, l):
                     init = u
                     break
             method = "贼克（元首）"
