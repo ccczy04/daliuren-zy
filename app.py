@@ -201,22 +201,87 @@ class DaLiuRenPan:
                  f"神煞：{self.shen_sha}", "参考断语：" + " | ".join(self.duan_yu)]
         return "\n".join(lines)
 
-    def generate_pan_image(self):
-        fig, ax = plt.subplots(figsize=(12, 8))
+       def generate_pan_image(self):
+        fig, ax = plt.subplots(figsize=(14, 16), facecolor='white')
         ax.axis('off')
-        ax.text(0.5, 0.95, f"zy 专属 · 大六壬排盘 {self.day_stem}{self.day_branch} {self.hour_branch}时", ha='center', fontsize=18, fontweight='bold')
-        y = 0.85
-        ax.text(0.1, y, "地盘: " + " ".join(self.earth), fontsize=11)
-        y -= 0.06
-        ax.text(0.1, y, "天盘: " + " ".join(self.heaven), fontsize=11)
-        y -= 0.08
-        for i, (u, l) in enumerate(self.four_lessons, 1):
-            ax.text(0.1, y, f"第{i}课：{u}{l}  宿：{self.xiu_map.get(u,'——')}", fontsize=11)
-            y -= 0.05
-        ax.text(0.1, y-0.05, f"三传（{self.trans_method}）：初 {self.three_trans[0]} 中 {self.three_trans[1]} 末 {self.three_trans[2]}", fontsize=13, color='red')
+
+        # ==================== 頂部標題 ====================
+        ax.text(0.5, 0.97, "六壬盤面", ha='center', fontsize=22, fontweight='bold', color='navy')
+
+        # ==================== 頂部干支欄 ====================
+        ax.add_patch(Rectangle((0.05, 0.89), 0.9, 0.07, fill=True, facecolor='#f0f0f0', edgecolor='black', linewidth=1.5))
+        ax.text(0.08, 0.925, "年 月 日 時", fontsize=13, fontweight='bold')
+        ax.text(0.32, 0.925, f"{self.day_stem}　{self.day_branch}", fontsize=18, color='#d32f2f', fontweight='bold')
+        ax.text(0.65, 0.925, f"月將 {self.yue_jiang}", fontsize=14, color='blue')
+
+        # ==================== 左側神煞欄 ====================
+        ax.add_patch(Rectangle((0.05, 0.18), 0.28, 0.68, fill=False, edgecolor='black', linewidth=2))
+        ax.text(0.09, 0.83, "本命 & 行年", fontsize=13, fontweight='bold')
+        ax.text(0.09, 0.79, self.nian_ming, fontsize=12, color='darkgreen')
+        ax.text(0.09, 0.74, f"月將 {self.yue_jiang}", fontsize=12)
+
+        y = 0.68
+        ax.text(0.09, y, "神煞", fontsize=13, fontweight='bold')
+        y -= 0.04
+        for key, val in list(self.shen_sha.items())[:10]:   # 顯示前10個
+            ax.text(0.09, y, f"{key} {val}", fontsize=10.5)
+            y -= 0.045
+
+        # ==================== 中間四課主格 ====================
+        ax.text(0.55, 0.58, "四課", ha='center', fontsize=16, fontweight='bold', color='darkgreen')
+
+        # 準備表格數據（傳統右→左順序）
+        upper = [u for u, l in reversed(self.four_lessons)]
+        lower = [l for u, l in reversed(self.four_lessons)]
+        xiu_list = [self.xiu_map.get(u, '—') for u in upper]
+        tj_list = list(self.tian_jiang_pos.keys())[:4]   # 前4個天將
+
+        cell_text = [
+            tj_list,           # 天將行
+            upper,             # 上神
+            lower,             # 下神
+            xiu_list           # 宿
+        ]
+        row_labels = ['天將', '上神', '下神', '宿']
+        col_labels = ['四', '三', '二', '一']
+
+        table = ax.table(
+            cellText=cell_text,
+            rowLabels=row_labels,
+            colLabels=col_labels,
+            loc='center',
+            cellLoc='center',
+            bbox=[0.35, 0.25, 0.58, 0.32]   # 位置與大小可微調
+        )
+        table.auto_set_font_size(False)
+        table.set_fontsize(11)
+        table.scale(1.3, 1.8)
+
+        # 格子顏色（模仿模板）
+        for (row, col), cell in table.get_celld().items():
+            cell.set_edgecolor('black')
+            cell.set_linewidth(1.2)
+            if row == 0 or row == -1:          # 標題行
+                cell.set_facecolor('#e8f0ff')
+            elif row == 1:                     # 上神行
+                cell.set_facecolor('#e3f2fd')
+
+        # ==================== 右側三傳 ====================
+        ax.add_patch(Rectangle((0.88, 0.28), 0.11, 0.35, fill=False, edgecolor='#d32f2f', linewidth=3))
+        ax.text(0.935, 0.60, "三傳", ha='center', fontsize=15, color='#d32f2f', fontweight='bold')
+        ax.text(0.935, 0.52, f"初　{self.three_trans[0]}", fontsize=13, color='darkred')
+        ax.text(0.935, 0.45, f"中　{self.three_trans[1]}", fontsize=13, color='darkred')
+        ax.text(0.935, 0.38, f"末　{self.three_trans[2]}", fontsize=13, color='darkred')
+
+        # ==================== 底部 ====================
+        ax.text(0.5, 0.13, f"神煞：{self.shen_sha}", ha='center', fontsize=10.5, color='orange')
+        if self.duan_yu:
+            ax.text(0.5, 0.08, "參考斷語：" + " | ".join(self.duan_yu[:3]), ha='center', fontsize=9.5, wrap=True)
+
+        # ==================== 儲存 ====================
         buf = BytesIO()
-        plt.savefig(buf, format="png", bbox_inches='tight', dpi=300)
-        plt.close()
+        plt.savefig(buf, format="png", dpi=350, bbox_inches='tight')
+        plt.close(fig)
         buf.seek(0)
         return buf
 
