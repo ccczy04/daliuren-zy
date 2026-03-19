@@ -136,8 +136,7 @@ class DaLiuRenPan:
             tj_pos[tj] = branches[pos]
             pos = (pos + direction) % 12
         return tj_pos
-
-       def _build_three_trans(self):
+    def _build_three_trans(self):
         lessons = self.four_lessons
         xia_zei = []
         for upper, lower in lessons:
